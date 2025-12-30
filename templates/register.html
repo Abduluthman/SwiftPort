@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</head>
+<body>
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+  </div>
+  <div class="container card">
+    <h2>Create Account</h2>
+    <input id="email"  type="text" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+  </div>
+
+<script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Fund Wallet</h2>
+<div class="card">
+    <input type="number" id="amount" placeholder="Amount to fund">
+    <button onclick="fund()">Pay with Paystack</button>
+</div>
+
+<script>
+function fund() {
+    const amount = parseFloat(document.getElementById("amount").value)
+    if (!amount) return alert("Enter a valid amount")
+
+    showLoading(true)
+
+    fetch("/api/payments/paystack/initiate", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ amount })
+    })
+    .then(res => res.json())
+    .then(data => {
+        showLoading(false)
+        if(data.checkout_url) {
+            window.location.href = data.checkout_url
+        } else {
+            alert(data.error)
+        }
+    })
+    .catch(err => { showLoading(false); console.error(err) })
+}
+</script>
+{% endblock %}

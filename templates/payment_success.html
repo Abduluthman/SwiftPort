@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Processing</title>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+    </div>
+    <h2>Verifying payment...</h2>
+
+    <script>
+        const params = new URLSearchParams(window.location.search)
+        const reference = params.get("reference")
+
+        if (!reference) {
+            alert("Missing payment reference")
+        }
+
+        fetch(`/api/payments/paystack/verify?reference=${reference}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("Wallet funded successfully")
+                window.location.href = "/wallet"
+            } else {
+                alert(data.error || "Verification failed")
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Profile</h2>
+
+<div class="grid">
+    <div class="card">
+        <h3>User Info</h3>
+        <p><strong>Email:</strong> <span id="profile-email">loading...</span></p>
+        <button onclick="showEditForm()">Edit Profile</button>
+    </div>
+
+    <div class="card">
+        <h3>Wallet Overview</h3>
+        <p><strong>Balance:</strong> ₦<span id="wallet-balance">0.00</span></p>
+    </div>
+</div>
+
+<!-- Edit Profile Form (Hidden by default) -->
+<div class="card" id="edit-profile-card" style="display:none;">
+    <h3>Edit Profile</h3>
+    <input type="email" id="edit-email" placeholder="New Email">
+    <input type="password" id="edit-password" placeholder="New Password">
+    <button onclick="updateProfile()">Save Changes</button>
+</div>
+
+<button onclick="logout()" style="margin-top:1rem;">Logout</button>
+
+<script>
+// Load user info
+fetch("/api/auth/profile", {
+    headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+})
+.then(res => res.json())
+.then(data => {
+    document.getElementById("profile-email").innerText = data.email
+})
+
+// Load wallet balance
+fetch("/api/wallet", {
+    headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+})
+.then(res => res.json())
+.then(data => {
+    document.getElementById("wallet-balance").innerText = data.balance.toFixed(2)
+})
+
+// Show edit form
+function showEditForm() {
+    document.getElementById("edit-profile-card").style.display = "block"
+    document.getElementById("edit-email").value = document.getElementById("profile-email").innerText
+}
+
+// Update profile
+function updateProfile() {
+    const email = document.getElementById("edit-email").value
+    const password = document.getElementById("edit-password").value
+
+    fetch("/api/auth/profile/update", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            alert("Profile updated!")
+            document.getElementById("profile-email").innerText = email
+            document.getElementById("edit-profile-card").style.display = "none"
+        } else {
+            alert(data.error)
+        }
+    })
+    .catch(err => console.error(err))
+}
+
+// Logout
+function logout() {
+    localStorage.removeItem("token")
+    window.location.href = "/login"
+}
+</script>
+{% endblock %}

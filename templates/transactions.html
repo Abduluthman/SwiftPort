@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Transactions</h2>
+<div id="transaction-list"></div>
+
+<script>
+fetch("/api/transactions", {
+    headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+})
+.then(res => res.json())
+.then(txs => {
+    const container = document.getElementById("transaction-list")
+    if(txs.length === 0) {
+        container.innerHTML = "<p>No transactions yet</p>"
+        return
+    }
+    container.innerHTML = txs.map(tx => `
+        <div class="card">
+            <p><strong>${tx.type}</strong> ₦${tx.amount}</p>
+            <p>Status: <span class="tx-status ${tx.status}">${tx.status}</span></p>
+            <p>Reference: ${tx.reference}</p>
+        </div>
+    `).join("")
+})
+.catch(err => {
+    console.error(err)
+    document.getElementById("transaction-list").innerHTML = "<p>Failed to load transactions</p>"
+});
+</script>
+{% endblock %}

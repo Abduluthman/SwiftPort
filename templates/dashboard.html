@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Welcome to FX-Port</h1>
+
+<div class="grid">
+    <div class="card">
+        <h3>Wallet Balance</h3>
+        <p id="wallet-balance">₦0.00</p>
+    </div>
+    <div class="card">
+        <h3>Recent Transactions</h3>
+        <ul id="recent-transactions">
+            <li>No transactions yet</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+fetch("/api/transactions", {
+    headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+})
+.then(res => res.json())
+.then(txs => {
+    const list = document.getElementById("recent-transactions");
+    if(txs.length === 0){
+        list.innerHTML = "<li>No transactions yet</li>";
+        return;
+    }
+    list.innerHTML = txs.slice(0,5).map(tx => `
+        <li>
+            <span>${tx.type} ₦${tx.amount}</span>
+            <span class="tx-status ${tx.status}">${tx.status}</span>
+        </li>
+    `).join("");
+});
+</script>
+{% endblock %}
